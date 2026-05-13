@@ -27,12 +27,12 @@ colors.forEach(colorEl => {
   });
 });
 
-// --- 3. FITUR KLIK UNTUK MEWARNAI (MOBILE FRIENDLY) ---
+// --- 3. FITUR KLIK UNTUK MEWARNAI (AMP & MOBILE FRIENDLY) ---
 const tbody = document.querySelector('#drawing-table tbody');
 if (tbody) {
-  // Menggunakan 'click' biasa agar sangat responsif saat disentuh di HP
   tbody.addEventListener('click', (e) => {
-    if (e.target.tagName === 'TD' && !e.target.closest('.headd')) {
+    // Mengecek apakah yang diklik adalah <td> dan BUKAN bagian header (Senin, Selasa, dll)
+    if (e.target.tagName === 'TD' && e.target.parentElement && !e.target.parentElement.classList.contains('headd')) {
       if (eraseState) {
         e.target.style.background = '';
       } else if (curColor !== '') {
@@ -42,7 +42,7 @@ if (tbody) {
   });
 }
 
-// --- 4. FITUR FILTER ANGKA (KEYBOARD HP FRIENDLY) ---
+// --- 4. FITUR FILTER ANGKA (AS, KOP, KEP, EKR) ---
 const inputs = [
   { id: 'asc', offset: 1, prefix: 'a' },
   { id: 'kopc', offset: 2, prefix: 'c' },
@@ -53,17 +53,17 @@ const inputs = [
 inputs.forEach(inputObj => {
   const inputEl = document.getElementById(inputObj.id);
   if (inputEl) {
-    // Menggunakan 'input' agar pergerakan keyboard HP langsung terdeteksi
+    // Menggunakan event 'input' agar pergerakan keyboard HP langsung terdeteksi
     inputEl.addEventListener('input', () => {
       const val = inputEl.value.trim();
       const targetCells = document.querySelectorAll(`td.asu:nth-child(5n+${inputObj.offset})`);
       
       targetCells.forEach(cell => {
         const text = cell.innerText.trim();
-        // Hapus warna bawaan
+        // Hapus class warna filter bawaan sebelumnya
         cell.className = cell.className.replace(new RegExp(`\\b${inputObj.prefix}\\d\\b`, 'g'), '').trim();
         
-        // Tambahkan warna jika angka cocok
+        // Tambahkan class baru jika angka yang diketik cocok
         if (val.length > 0 && text === val) {
           cell.classList.add(inputObj.prefix + text);
         }
@@ -72,11 +72,14 @@ inputs.forEach(inputObj => {
   }
 });
 
-// --- 5. FITUR TOMBOL RESET ---
+// --- 5. FITUR TOMBOL RESET FILTER ---
 const rb = document.getElementById('rb');
 if (rb) {
   rb.addEventListener('click', () => {
+    // Kosongkan form input
     document.getElementById('myForm').reset();
+    
+    // Hapus semua class warna filter
     document.querySelectorAll('td.asu').forEach(cell => {
       cell.className = cell.className.replace(/\b[ekca]\d\b/g, '').trim();
     });
